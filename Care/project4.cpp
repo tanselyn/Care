@@ -23,7 +23,6 @@ int main(int argc, char * argv[])
     
     vector<Cage> zooCages;
     
-    pair<int,double> minDistance(0,numeric_limits<double>::infinity());
     string input;
     
     double totalDistance = 0;
@@ -31,8 +30,9 @@ int main(int argc, char * argv[])
     int pos = 0;
     int visitCages = 0;
     char type;
-    char mode;
+    char mode = '?';
     
+    os << fixed << setprecision(2);
     while ((type = getopt_long(argc, argv, "m:h", longopts, &index)) != -1) {
         switch (type) {
             case 'm':
@@ -55,7 +55,7 @@ int main(int argc, char * argv[])
         getline(cin,input);
         pos = (int)input.find(' ',0);
         Cage insert((int)zooCages.size(),stoi(input.substr(0,pos)),stoi(input.substr(pos)),
-                                0,false);
+                    0,false);
         if (insert.xCoord == 0 || insert.yCoord == 0) {
             insert.wild = 1;
         }
@@ -71,37 +71,39 @@ int main(int argc, char * argv[])
         zooCages.front().visited = true;
         zooCages.front().parent = 0;
         
-        while (visitCages < zooCages.size() - 1) {
-            for (int i = 0; i < (int)zooCages.size(); ++i) {
-                if (zooCages[i].visited == true) {
-                    for (int j = 1; j < (int)zooCages.size(); ++j) {
-                        if (zooCages[j].visited == false) {
-                            if (zooCages[j].wild == 0 || (zooCages[j].wild == 2 &&
-                                zooCages[i].wild == 1)) {
-                                double distance = sqrt((zooCages[i].xCoord - zooCages[j].xCoord) *
-                                                       (zooCages[i].xCoord - zooCages[j].xCoord) +
-                                                       (zooCages[i].yCoord - zooCages[j].yCoord) *
-                                                       (zooCages[i].yCoord - zooCages[j].yCoord));
-                                if (distance < zooCages[j].distance) {
-                                    zooCages[j].distance = distance;
-                                    zooCages[j].parent = i;
-                                }
-                                if (zooCages[j].distance < minDistance.second) {
-                                    minDistance.first = j;
-                                }
-                            }
+        while (visitCages < (int)zooCages.size()) {
+    	    double minDistance = numeric_limits<double>::infinity();
+            int minIndex = 0;
+            for (int i = 1; i < (int)zooCages.size(); ++i) {
+                if (zooCages[i].visited == false) {
+                    if (zooCages[i].wild == 0 || zooCages[i].wild == 1 ||
+                        (zooCages[i].wild == 2 && zooCages[index].wild == 1) ||
+                        (zooCages[i].wild == 1 && zooCages[index].wild == 2)) {
+                        double distance = sqrt((zooCages[index].xCoord - zooCages[i].xCoord) *
+                                               (zooCages[index].xCoord - zooCages[i].xCoord) +
+                                               (zooCages[index].yCoord - zooCages[i].yCoord) *
+                                               (zooCages[index].yCoord - zooCages[i].yCoord));
+                        if (distance < zooCages[i].distance) {
+                            zooCages[i].distance = distance;
+                            zooCages[i].parent = index;
+                        }
+                        if (zooCages[i].distance < minDistance) {
+                            minIndex = i;
+                            minDistance = zooCages[i].distance;
                         }
                     }
                 }
+
             }
-            zooCages[minDistance.first].visited = true;
+            index = minIndex;
+    	    zooCages[index].visited = true;
             ++visitCages;
         }
-        for (int i = 0; i < (int)zooCages.size(); ++i) {
+        for (int i = 1; i < (int)zooCages.size(); ++i) {
             totalDistance += zooCages[i].distance;
         }
-        os << fixed << setprecision(2) << totalDistance << '\n';
-        for (int i = 0; i < (int)zooCages.size(); ++i) {
+        os << totalDistance << '\n';
+        for (int i = 1; i < (int)zooCages.size(); ++i) {
             if (zooCages[i].visited == false) {
                 cerr << "Cannot construct MST" << '\n';
                 exit(1);

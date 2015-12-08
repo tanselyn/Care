@@ -1,6 +1,8 @@
 #ifndef Care_project4_h
 #define Care_project4_h
 
+#include <limits>
+
 struct Cage {
     int index;
     int xCoord;
