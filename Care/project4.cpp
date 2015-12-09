@@ -76,9 +76,11 @@ int main(int argc, char * argv[])
             int minIndex = 0;
             for (int i = 1; i < (int)zooCages.size(); ++i) {
                 if (zooCages[i].visited == false) {
-                    if (zooCages[i].wild == 0 || zooCages[i].wild == 1 ||
+                    if ((zooCages[i].wild == 0 && zooCages[index].wild == 1)||
+                        (zooCages[i].wild == 0 && zooCages[index].wild == 0) ||
+                         zooCages[i].wild == 1 ||
                         (zooCages[i].wild == 2 && zooCages[index].wild == 1) ||
-                        (zooCages[i].wild == 1 && zooCages[index].wild == 2)) {
+                        (zooCages[i].wild == 2 && zooCages[index].wild == 2)) {
                         double distance = sqrt((zooCages[index].xCoord - zooCages[i].xCoord) *
                                                (zooCages[index].xCoord - zooCages[i].xCoord) +
                                                (zooCages[index].yCoord - zooCages[i].yCoord) *
@@ -87,10 +89,10 @@ int main(int argc, char * argv[])
                             zooCages[i].distance = distance;
                             zooCages[i].parent = index;
                         }
-                        if (zooCages[i].distance < minDistance) {
-                            minIndex = i;
-                            minDistance = zooCages[i].distance;
-                        }
+                    }
+                    if (zooCages[i].distance < minDistance) {
+                        minIndex = i;
+                        minDistance = zooCages[i].distance;
                     }
                 }
 
@@ -113,10 +115,8 @@ int main(int argc, char * argv[])
         
     }
     if (mode == 'P') {
-        cout << "OPTTSP" << endl;
     }
     if (mode == 'A') {
-        cout << "FASTTSP" << endl;
     }
     
     cout << os.str();
