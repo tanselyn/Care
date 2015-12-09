@@ -71,6 +71,7 @@ int main(int argc, char * argv[])
         zooCages.front().visited = true;
         zooCages.front().parent = 0;
         
+        index = 0;
         while (visitCages < (int)zooCages.size()) {
     	    double minDistance = numeric_limits<double>::infinity();
             int minIndex = 0;
@@ -78,13 +79,13 @@ int main(int argc, char * argv[])
                 if (zooCages[i].visited == false) {
                     if ((zooCages[i].wild == 0 && zooCages[index].wild == 1)||
                         (zooCages[i].wild == 0 && zooCages[index].wild == 0) ||
-                         zooCages[i].wild == 1 ||
+                        zooCages[i].wild == 1 ||
                         (zooCages[i].wild == 2 && zooCages[index].wild == 1) ||
                         (zooCages[i].wild == 2 && zooCages[index].wild == 2)) {
-                        double distance = sqrt((zooCages[index].xCoord - zooCages[i].xCoord) *
-                                               (zooCages[index].xCoord - zooCages[i].xCoord) +
-                                               (zooCages[index].yCoord - zooCages[i].yCoord) *
-                                               (zooCages[index].yCoord - zooCages[i].yCoord));
+                        
+                        double x = zooCages[index].xCoord - zooCages[i].xCoord;
+                        double y = zooCages[index].yCoord - zooCages[i].yCoord;
+                        double distance = sqrt((x * x) + (y * y));
                         if (distance < zooCages[i].distance) {
                             zooCages[i].distance = distance;
                             zooCages[i].parent = index;
@@ -95,24 +96,24 @@ int main(int argc, char * argv[])
                         minDistance = zooCages[i].distance;
                     }
                 }
-
+                
             }
             index = minIndex;
     	    zooCages[index].visited = true;
+            if (index != 0) {
+                os << min(index,zooCages[index].parent) << " "
+                    << max(index,zooCages[index].parent) << '\n';
+            }
             ++visitCages;
         }
-        for (int i = 1; i < (int)zooCages.size(); ++i) {
-            totalDistance += zooCages[i].distance;
-        }
-        os << totalDistance << '\n';
         for (int i = 1; i < (int)zooCages.size(); ++i) {
             if (zooCages[i].visited == false) {
                 cerr << "Cannot construct MST" << '\n';
                 exit(1);
             }
-            os << min(i,zooCages[i].parent) << " " << max(i,zooCages[i].parent) << '\n';
+            totalDistance += zooCages[i].distance;
         }
-        
+        cout << fixed << setprecision(2) << totalDistance << '\n';
     }
     if (mode == 'P') {
     }
