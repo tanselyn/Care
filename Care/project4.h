@@ -8,7 +8,7 @@ struct Cage {
     int xCoord;
     int yCoord;
     int wild;
-    
+
     bool visited;
     double distance;
     int parent;
