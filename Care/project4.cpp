@@ -72,7 +72,7 @@ int main(int argc, char * argv[])
         zooCages.front().parent = 0;
         
         index = 0;
-        while (visitCages < (int)zooCages.size()) {
+        while (visitCages < (int)zooCages.size() - 1) {
     	    double minDistance = numeric_limits<double>::infinity();
             int minIndex = 0;
             for (int i = 1; i < (int)zooCages.size(); ++i) {
@@ -100,10 +100,8 @@ int main(int argc, char * argv[])
             }
             index = minIndex;
     	    zooCages[index].visited = true;
-            if (index != 0) {
-                os << min(index,zooCages[index].parent) << " "
-                    << max(index,zooCages[index].parent) << '\n';
-            }
+            os << min(index,zooCages[index].parent) << " "
+                << max(index,zooCages[index].parent) << '\n';
             ++visitCages;
         }
         for (int i = 1; i < (int)zooCages.size(); ++i) {
