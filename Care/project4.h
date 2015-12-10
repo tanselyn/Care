@@ -19,5 +19,9 @@ struct Cage {
 
 double findDistance(int index, int i, std::vector<Cage> &zooCages);
 
+double MSTDistance(std::vector<int> excluded, std::vector<Cage> &zooCages);
+
+void choosePath(double upperBound, std::vector<Cage> &zooCages, std::vector<double> distanceMatrix);
+
 
 #endif
