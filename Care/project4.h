@@ -17,5 +17,7 @@ struct Cage {
                     visited(v), distance(std::numeric_limits<double>::infinity()) {}
 };
 
+double findDistance(int index, int i, std::vector<Cage> &zooCages);
+
 
 #endif

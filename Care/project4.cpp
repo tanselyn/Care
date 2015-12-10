@@ -15,6 +15,12 @@ static struct option longopts[] = {
     {nullptr, 0, nullptr, 0}
 };
 
+double findDistance(int i, int j, vector<Cage> &zooCages) {
+    double x = zooCages[i].xCoord - zooCages[j].xCoord;
+    double y = zooCages[i].yCoord - zooCages[j].yCoord;
+    return sqrt((x * x) + (y * y));
+}
+
 int main(int argc, char * argv[])
 {
     ios_base::sync_with_stdio(false);
@@ -26,13 +32,12 @@ int main(int argc, char * argv[])
     string input;
     
     double totalDistance = 0;
+    int visitCages = 0;
     int index = 0;
     int pos = 0;
-    int visitCages = 0;
     char type;
     char mode = '?';
     
-    os << fixed << setprecision(2);
     while ((type = getopt_long(argc, argv, "m:h", longopts, &index)) != -1) {
         switch (type) {
             case 'm':
@@ -83,9 +88,7 @@ int main(int argc, char * argv[])
                         (zooCages[i].wild == 2 && zooCages[index].wild == 1) ||
                         (zooCages[i].wild == 2 && zooCages[index].wild == 2)) {
                         
-                        double x = zooCages[index].xCoord - zooCages[i].xCoord;
-                        double y = zooCages[index].yCoord - zooCages[i].yCoord;
-                        double distance = sqrt((x * x) + (y * y));
+                        double distance = findDistance(index, i, zooCages);
                         if (distance < zooCages[i].distance) {
                             zooCages[i].distance = distance;
                             zooCages[i].parent = index;
@@ -114,8 +117,87 @@ int main(int argc, char * argv[])
         cout << fixed << setprecision(2) << totalDistance << '\n';
     }
     if (mode == 'P') {
+        vector<double> distanceMatrix;
+        for (int i = 0; i < (int)zooCages.size(); ++i) {
+            for (int j = 0; j < (int)zooCages.size(); ++j) {
+                distanceMatrix[i*zooCages.size() + j] = findDistance(i, j, zooCages);
+            }
+        }
+        
     }
     if (mode == 'A') {
+        vector<int> adjacent;
+        int lastNode = 0;
+        zooCages.front().distance = 0;
+        zooCages.front().visited = true;
+        zooCages.front().parent = 0;
+        os << "0";
+        index = 0;
+        
+        /*double minDistance = numeric_limits<double>::infinity();
+        int minIndex = 0;
+        for (int i = 1; i < (int)zooCages.size(); ++i) {
+            double distance = findDistance(0, i, zooCages);
+            if (distance < minDistance) {
+                minIndex = i;
+                minDistance = distance;
+            }
+        }
+        zooCages[minIndex].visited = true;
+        zooCages[minIndex].distance = minDistance;
+        zooCages[minIndex].parent = 0;*/
+        
+        while (visitCages < (int)zooCages.size() - 1) {
+    	    double minDistance = numeric_limits<double>::infinity();
+            int minIndex = 0;
+            for (int i = 1; i < (int)zooCages.size(); ++i) {
+                if (zooCages[i].visited == false) {
+                    double distance = findDistance(index, i, zooCages);
+                    if (distance < minDistance) {
+                        minIndex = i;
+                        minDistance = distance;
+                    }
+                }
+            }
+            if (visitCages == zooCages.size() - 2) lastNode = minIndex;
+    	    zooCages[minIndex].visited = true;
+            zooCages[minIndex].distance = minDistance;
+            zooCages[minIndex].parent = index;
+            index = minIndex;
+            adjacent.push_back(zooCages[minIndex].parent);
+            
+            ++visitCages;
+        }
+        adjacent.push_back(lastNode);
+        
+        //int improve = 0;
+        
+        for (int i = 1; i < (int)zooCages.size(); ++i) {
+            totalDistance += zooCages[i].distance;
+        }
+        totalDistance += findDistance(0, lastNode, zooCages);
+        
+        //while (improve < 20) {
+            double bestDistance = totalDistance;
+            for (int i = 0; i < adjacent.size() - 2; ++i) {
+                for (int j = i + 2; j < adjacent.size(); ++j) {
+                    double change = (findDistance(adjacent[i], adjacent[j], zooCages)) +
+                                    (findDistance(adjacent[i + 1], adjacent[j + 1], zooCages)) -
+                                    (findDistance(adjacent[i], adjacent[i + 1], zooCages)) -
+                                    (findDistance(adjacent[j], adjacent[j + 1], zooCages));
+                    if (change < 0) {
+                        reverse(adjacent.begin() + i + 1, adjacent.begin() + j + 1);
+                    }
+                }
+            }
+        //}
+        for (int i = 1; i < (int)zooCages.size(); ++i) {
+            totalDistance += zooCages[i].distance;
+        }
+        totalDistance += findDistance(0, adjacent.back(), zooCages);
+
+        cout << fixed << setprecision(2) << totalDistance << '\n';
+
     }
     
     cout << os.str();
