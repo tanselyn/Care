@@ -23,27 +23,27 @@ double findDistance(int i, int j, vector<Cage> &zooCages) {
     return sqrt((x * x) + (y * y));
 }
 
-double MSTDistance(std::vector<Cage> &zooCages) {
-    zooCages.front().distance = 0;
-    zooCages.front().visited = true;
-    zooCages.front().parent = 0;
+double MSTDistance(deque<int> &unvisited, vector<Cage> zooCages) {
+    zooCages[unvisited.front()].distance = 0;
+    zooCages[unvisited.front()].visited = true;
+    zooCages[unvisited.front()].parent = 0;
     
-    double totalDistance = 0;
+    double totalDistance  = 0 ;
+    int index = unvisited.front();
     int visitCages = 0;
-    int index = 0;
-    while (visitCages < (int)zooCages.size() - 1) {
+    while (visitCages < (int)unvisited.size()) {
         double minDistance = numeric_limits<double>::infinity();
         int minIndex = 0;
-        for (int i = 1; i < (int)zooCages.size(); ++i) {
-            if (zooCages[i].visited == false) {
-                double distance = findDistance(index, i, zooCages);
-                if (distance < zooCages[i].distance) {
-                    zooCages[i].distance = distance;
-                    zooCages[i].parent = index;
+        for (int i = 1; i < (int)unvisited.size(); ++i) {
+            if (zooCages[unvisited[i]].visited == false) {
+                double distance = findDistance(index, unvisited[i], zooCages);
+                if (distance < zooCages[unvisited[i]].distance) {
+                    zooCages[unvisited[i]].distance = distance;
+                    zooCages[unvisited[i]].parent = index;
                 }
-                if (zooCages[i].distance < minDistance) {
-                    minIndex = i;
-                    minDistance = zooCages[i].distance;
+                if (zooCages[unvisited[i]].distance < minDistance) {
+                    minIndex = unvisited[i];
+                    minDistance = zooCages[unvisited[i]].distance;
                 }
             }
         }
@@ -53,6 +53,7 @@ double MSTDistance(std::vector<Cage> &zooCages) {
         ++visitCages;
     }
     return totalDistance;
+
 }
 
 void gen_perms (vector<Cage> &zooCages, deque<int> &unvisited, vector<int> &path,
@@ -68,7 +69,7 @@ void gen_perms (vector<Cage> &zooCages, deque<int> &unvisited, vector<int> &path
         return;
     }
     
-    if (!promising(currentDistance, minDistance, zooCages, path.back())) return;
+    if (!promising(currentDistance, minDistance, zooCages, unvisited, path.back())) return;
     for (int i = 0; i < (int)unvisited.size(); i++) {
         path.push_back(unvisited.front());
         unvisited.pop_front();
@@ -78,10 +79,10 @@ void gen_perms (vector<Cage> &zooCages, deque<int> &unvisited, vector<int> &path
     }
 }
     
-bool promising (double currentDistance, double &minDistance,
-                        vector<Cage> &zooCages, int index) {
-    currentDistance += MSTDistance(zooCages);
-    currentDistance += findDistance(0, index, zooCages);
+bool promising (double currentDistance, double &minDistance, vector<Cage> &zooCages,
+                        deque<int> &unvisited, int index) {
+    unvisited.push_back(0);
+    currentDistance += MSTDistance(unvisited, zooCages);
     if (currentDistance < minDistance) return true;
     else return false;
 }
