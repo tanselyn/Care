@@ -23,8 +23,8 @@ double MSTDistance(std::vector<Cage> &zooCages);
 
 void gen_perms (std::vector<Cage> &zooCages, std::deque<int> &unvisited,
                 std::vector<int> &path, std::vector<int> &adjacent,
-                double MST, double &minDistance, double &currentDistance);
+                double &minDistance, double &currentDistance);
 
-bool promising (double MST, double &currentDistance, int xCoord1, int yCoord1,
-                int xCoord2, int yCoord2);
+bool promising (double currentDistance, double &minDistance,
+                std::vector<Cage> &zooCages, int index);
 #endif

@@ -56,38 +56,33 @@ double MSTDistance(std::vector<Cage> &zooCages) {
 }
 
 void gen_perms (vector<Cage> &zooCages, deque<int> &unvisited, vector<int> &path,
-                vector<int> &adjacent, double MST, double &minDistance, double &currentDistance) {
+                vector<int> &adjacent, double &minDistance, double &currentDistance) {
+    currentDistance += findDistance(path.back(), *(path.end() - 1), zooCages);
     if (unvisited.empty()) {
-        double totalDistance = 0;
-        for (int i = 0; i < path.size() - 1; ++i) {
-            totalDistance += findDistance(path[i],path[i + 1], zooCages);
-        }
-        totalDistance += findDistance(0, path[path.size() - 2], zooCages);
+        currentDistance += findDistance(0, path[path.size() - 2], zooCages);
         
-        if (totalDistance < minDistance) {
-            minDistance = totalDistance;
+        if (currentDistance < minDistance) {
+            minDistance = currentDistance;
             adjacent = path;
         }
         return;
     }
-    if (!promising(MST, currentDistance, zooCages[path.back()].xCoord,
-                   zooCages[path.back()].yCoord, zooCages[*(path.end() - 1)].xCoord,
-                   zooCages[*(path.end() - 1)].yCoord)) return;
+    
+    if (!promising(currentDistance, minDistance, zooCages, path.back())) return;
     for (int i = 0; i < (int)unvisited.size(); i++) {
         path.push_back(unvisited.front());
         unvisited.pop_front();
-        gen_perms(zooCages, unvisited, path, adjacent, MST, minDistance, currentDistance);
+        gen_perms(zooCages, unvisited, path, adjacent, minDistance, currentDistance);
         unvisited.push_back(path.back());
         path.pop_back();
     }
 }
     
-bool promising (double MST, double &currentDistance, int xCoord1, int yCoord1,
-                int xCoord2, int yCoord2) {
-    double x = xCoord1 - xCoord2;
-    double y = yCoord1 - yCoord2;
-    currentDistance += sqrt((x * x) + (y * y));
-    if (currentDistance < 2 * MST) return true;
+bool promising (double currentDistance, double &minDistance,
+                        vector<Cage> &zooCages, int index) {
+    currentDistance += MSTDistance(zooCages);
+    currentDistance += findDistance(0, index, zooCages);
+    if (currentDistance < minDistance) return true;
     else return false;
 }
 /*double partialMSTDistance(vector<int> excluded, vector<Cage> zooCages) {
@@ -234,11 +229,52 @@ int main(int argc, char * argv[])
         adjacent.push_back(0);
         path.push_back(0);
         
+        zooCages.front().distance = 0;
+        zooCages.front().visited = true;
+        zooCages.front().parent = 0;
+        
+        int index = 0;
+        while (visitCages < (int)zooCages.size() - 1) {
+    	    double minDistance = numeric_limits<double>::infinity();
+            int minIndex = 0;
+            for (int i = 1; i < (int)zooCages.size(); ++i) {
+                if (zooCages[i].visited == false) {
+                    double distance = findDistance(index, i, zooCages);
+                    if (distance < minDistance) {
+                        minIndex = i;
+                        minDistance = distance;
+                    }
+                }
+            }
+    	    zooCages[minIndex].visited = true;
+            index = minIndex;
+            adjacent.push_back(minIndex);
+            
+            ++visitCages;
+        }
+        adjacent.push_back(0);
+        
+        for (int i = 0; i < (int)adjacent.size() - 3; ++i) {
+            for (int j = i + 2; j < (int)adjacent.size() - 1; ++j) {
+                double change = (findDistance(adjacent[i], adjacent[j], zooCages)) +
+                (findDistance(adjacent[i + 1], adjacent[j + 1], zooCages)) -
+                (findDistance(adjacent[i], adjacent[i + 1], zooCages)) -
+                (findDistance(adjacent[j], adjacent[j + 1], zooCages));
+                if (change < 0) {
+                    reverse(adjacent.begin() + i + 1, adjacent.begin() + j + 1);
+                }
+            }
+        }
+        for (int i = 0; i < (int)zooCages.size() - 1; ++i) {
+            minDistance += findDistance(adjacent[i],adjacent[i + 1], zooCages);
+        }
+        minDistance += findDistance(0, adjacent[adjacent.size() - 2], zooCages);
+        
         for (int i = 1; i < (int)zooCages.size(); ++i) {
             unvisited.push_back(i);
         }
 
-        gen_perms(zooCages, unvisited, path, adjacent, MSTDistance(zooCages),
+        gen_perms(zooCages, unvisited, path, adjacent,
                   minDistance, currentDistance);
         for (int i = 0; i < (int)zooCages.size() - 2; ++i) {
             os << adjacent[i] << " ";
