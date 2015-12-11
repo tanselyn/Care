@@ -19,9 +19,12 @@ struct Cage {
 
 double findDistance(int index, int i, std::vector<Cage> &zooCages);
 
-double MSTDistance(std::vector<int> excluded, std::vector<Cage> &zooCages);
+double MSTDistance(std::vector<Cage> &zooCages);
 
-void choosePath(double upperBound, std::vector<Cage> &zooCages, std::vector<double> distanceMatrix);
+void gen_perms (std::vector<Cage> &zooCages, std::deque<int> &unvisited,
+                std::vector<int> &path, std::vector<int> &adjacent,
+                double MST, double &minDistance, double &currentDistance);
 
-
+bool promising (double MST, double &currentDistance, int xCoord1, int yCoord1,
+                int xCoord2, int yCoord2);
 #endif
