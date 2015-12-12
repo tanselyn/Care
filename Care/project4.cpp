@@ -114,11 +114,27 @@ double MSTDistance(deque<int> &unvisited, vector<Cage> &zooCages, vector<double>
 }
 
 bool promising (double currentDistance, double &minDistance, vector<Cage> &zooCages,
-                vector<double> &distanceMatrix, deque<int> &unvisited) {
+                vector<double> &distanceMatrix, deque<int> &unvisited, vector<int> &path) {
     unvisited.push_back(0);
     //cerr << currentDistance << endl;
     currentDistance += MSTDistance(unvisited, zooCages, distanceMatrix);
     //cerr << currentDistance << endl;
+    double minConnection1 = numeric_limits<double>::infinity();
+    double minConnection2 = numeric_limits<double>::infinity();
+    for (int i = 0; i < (int)unvisited.size(); ++i) {
+        for (int j = 0; j < (int)path.size(); ++j) {
+            if (distanceMatrix[(unvisited[i] * zooCages.size()) + path[j]] <
+                minConnection1) {
+                minConnection1 = distanceMatrix[(unvisited[i] * zooCages.size()) + path[j]];
+            }
+            else if (distanceMatrix[(unvisited[i] * zooCages.size()) + path[j]] <
+                     minConnection2) {
+                minConnection2 = distanceMatrix[(unvisited[i] * zooCages.size()) + path[j]];
+            }
+        }
+    }
+    currentDistance += minConnection1;
+    currentDistance += minConnection2;
     unvisited.pop_back();
     if (currentDistance < minDistance) return true;
     else return false;
@@ -143,7 +159,7 @@ void gen_perms (vector<Cage> &zooCages, deque<int> &unvisited, vector<int> &path
     }
     //cerr << unvisited.size() << endl;
     if (!promising(currentDistance, minDistance, zooCages, distanceMatrix,
-                   unvisited)) return;
+                   unvisited, path)) return;
     for (int i = 0; i < (int)unvisited.size(); i++) {
         path.push_back(unvisited.front());
         unvisited.pop_front();

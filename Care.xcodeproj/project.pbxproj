@@ -229,6 +229,7 @@
 				BB11A7FB1C16552C007D4851 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

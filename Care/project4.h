@@ -26,7 +26,8 @@ double MSTDistance(std::deque<int> &unvisited, std::vector<Cage> &zooCages,
                    std::vector<double> &distanceMatrix);
 
 bool promising (double currentDistance, double &minDistance, std::vector<Cage> &zooCages,
-                std::vector<double> &distanceMatrix, std::deque<int> &unvisited);
+                std::vector<double> &distanceMatrix, std::deque<int> &unvisited,
+                std::vector<int> &path);
 
 void gen_perms (std::vector<Cage> &zooCages, std::deque<int> &unvisited, std::vector<int> &path,
                 std::vector<int> &adjacent, std::vector<double> &distanceMatrix,
