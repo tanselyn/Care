@@ -317,13 +317,15 @@ int main(int argc, char * argv[])
         adjacent.push_back(0);
         
         for (int i = 0; i < (int)adjacent.size() - 3; ++i) {
+            double temp = findDistance(adjacent[i], adjacent[i + 1], zooCages);
             for (int j = i + 2; j < (int)adjacent.size() - 1; ++j) {
                 double change = (findDistance(adjacent[i], adjacent[j], zooCages)) +
                 (findDistance(adjacent[i + 1], adjacent[j + 1], zooCages)) -
-                (findDistance(adjacent[i], adjacent[i + 1], zooCages)) -
-                (findDistance(adjacent[j], adjacent[j + 1], zooCages));
+                (temp) - (findDistance(adjacent[j], adjacent[j + 1], zooCages));
+                
                 if (change < 0) {
                     reverse(adjacent.begin() + i + 1, adjacent.begin() + j + 1);
+                    temp = findDistance(adjacent[i], adjacent[i + 1], zooCages);
                 }
             }
         }
