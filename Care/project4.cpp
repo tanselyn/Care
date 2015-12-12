@@ -102,7 +102,7 @@ double MSTDistance(deque<int> &unvisited, vector<Cage> &zooCages, vector<double>
         index = minIndex;
         zooCages[index].visited = true;
         totalDistance += minDistance;
-        //cerr << minDistance << " " << totalDistance << endl;
+        
         ++visitCages;
     }
     for (int i = 0; i < (int)zooCages.size(); ++i) {
@@ -115,25 +115,30 @@ double MSTDistance(deque<int> &unvisited, vector<Cage> &zooCages, vector<double>
 
 bool promising (double currentDistance, double &minDistance, vector<Cage> &zooCages,
                 vector<double> &distanceMatrix, deque<int> &unvisited, vector<int> &path) {
-    //cerr << currentDistance << endl;
     currentDistance += MSTDistance(unvisited, zooCages, distanceMatrix);
-    //cerr << currentDistance << endl;
+    
     double minConnection1 = numeric_limits<double>::infinity();
     double minConnection2 = numeric_limits<double>::infinity();
+    
     for (int i = 0; i < (int)unvisited.size(); ++i) {
-        for (int j = 0; j < (int)path.size(); ++j) {
-            if (distanceMatrix[(unvisited[i] * zooCages.size()) + path[j]] <
+        if (distanceMatrix[(unvisited[i] * zooCages.size()) + path.front()] <
+            minConnection1) {
+            minConnection1 = distanceMatrix[(unvisited[i] * zooCages.size()) +
+                                            path.front()];
+        }
+    }
+    
+    for (int i = 0; i < (int)unvisited.size(); ++i) {
+        if (distanceMatrix[(unvisited[i] * zooCages.size()) + path.back()] <
+            minConnection2) {
+            if (distanceMatrix[(unvisited[i] * zooCages.size()) + path.back()] !=
                 minConnection1) {
-                minConnection1 = distanceMatrix[(unvisited[i] * zooCages.size()) + path[j]];
-            }
-            else if (distanceMatrix[(unvisited[i] * zooCages.size()) + path[j]] <
-                     minConnection2) {
-                minConnection2 = distanceMatrix[(unvisited[i] * zooCages.size()) + path[j]];
+                minConnection2 = distanceMatrix[(unvisited[i] * zooCages.size()) +
+                                                path.back()];
             }
         }
     }
-    currentDistance += minConnection1;
-    currentDistance += minConnection2;
+    currentDistance = currentDistance + minConnection1 + minConnection2;
     if (currentDistance < minDistance) return true;
     else return false;
 }
@@ -143,8 +148,6 @@ void gen_perms (vector<Cage> &zooCages, deque<int> &unvisited, vector<int> &path
                 double &minDistance, double currentDistance) {
     currentDistance += distanceMatrix[(path.back() * zooCages.size()) +
                                       path[path.size() - 2]];
-    //cerr << "hello" << endl;
-    //cerr <<  minDistance << endl;
     if (unvisited.empty()) {
         currentDistance += distanceMatrix[path[path.size() - 2]];
         
@@ -155,7 +158,7 @@ void gen_perms (vector<Cage> &zooCages, deque<int> &unvisited, vector<int> &path
         }
         return;
     }
-    //cerr << unvisited.size() << endl;
+    
     if (!promising(currentDistance, minDistance, zooCages, distanceMatrix,
                    unvisited, path)) return;
     for (int i = 0; i < (int)unvisited.size(); i++) {
@@ -292,6 +295,7 @@ int main(int argc, char * argv[])
         
         gen_perms(zooCages, unvisited, path, adjacent, distanceMatrix,
                   minDistance, currentDistance);
+        
         adjacent.push_back(0);
         for (int i = 0; i < (int)adjacent.size() - 1; ++i) {
             os << adjacent[i] << " ";
