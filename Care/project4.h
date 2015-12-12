@@ -20,16 +20,16 @@ struct Cage {
 double findDistance(int index, int i, std::vector<Cage> &zooCages);
 
 double FASTDistance(std::vector<Cage> &zooCages, std::vector<int> &adjacent,
-                    std::vector<int> &distanceMatrix);
+                    std::vector<double> &distanceMatrix);
 
 double MSTDistance(std::deque<int> &unvisited, std::vector<Cage> &zooCages,
-                   std::vector<int> &distanceMatrix);
+                   std::vector<double> &distanceMatrix);
 
 bool promising (double currentDistance, double &minDistance, std::vector<Cage> &zooCages,
-                std::vector<int> &distanceMatrix, std::deque<int> &unvisited);
+                std::vector<double> &distanceMatrix, std::deque<int> &unvisited);
 
 void gen_perms (std::vector<Cage> &zooCages, std::deque<int> &unvisited, std::vector<int> &path,
-                std::vector<int> &adjacent, std::vector<int> &distanceMatrix,
+                std::vector<int> &adjacent, std::vector<double> &distanceMatrix,
                 double &minDistance, double currentDistance);
 
 

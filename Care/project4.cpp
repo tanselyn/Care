@@ -24,7 +24,7 @@ double findDistance(int i, int j, vector<Cage> &zooCages) {
 }
 
 double FASTDistance(vector<Cage> &zooCages, vector<int> &adjacent,
-                    vector<int> &distanceMatrix) {
+                    vector<double> &distanceMatrix) {
     double totalDistance = 0;
     zooCages.front().distance = 0;
     zooCages.front().visited = true;
@@ -69,13 +69,13 @@ double FASTDistance(vector<Cage> &zooCages, vector<int> &adjacent,
     }
     for (int i = 0; i < (int)zooCages.size() - 1; ++i) {
         totalDistance += distanceMatrix[(adjacent[i] * zooCages.size()) +
-                                         adjacent[i + 1]];
+                                        adjacent[i + 1]];
     }
     totalDistance += distanceMatrix[adjacent[adjacent.size() - 2]];
     return totalDistance;
 }
 
-double MSTDistance(deque<int> &unvisited, vector<Cage> &zooCages, vector<int> &distanceMatrix) {
+double MSTDistance(deque<int> &unvisited, vector<Cage> &zooCages, vector<double> &distanceMatrix) {
     zooCages[unvisited.front()].distance = 0;
     zooCages[unvisited.front()].visited = true;
     zooCages[unvisited.front()].parent = unvisited.front();
@@ -105,7 +105,7 @@ double MSTDistance(deque<int> &unvisited, vector<Cage> &zooCages, vector<int> &d
         //cerr << minDistance << " " << totalDistance << endl;
         ++visitCages;
     }
-    for (int i = 0; i < zooCages.size(); ++i) {
+    for (int i = 0; i < (int)zooCages.size(); ++i) {
         zooCages[i]. distance = numeric_limits<double>::infinity();
         zooCages[i].visited = false;
     }
@@ -114,7 +114,7 @@ double MSTDistance(deque<int> &unvisited, vector<Cage> &zooCages, vector<int> &d
 }
 
 bool promising (double currentDistance, double &minDistance, vector<Cage> &zooCages,
-                vector<int> &distanceMatrix, deque<int> &unvisited) {
+                vector<double> &distanceMatrix, deque<int> &unvisited) {
     unvisited.push_back(0);
     //cerr << currentDistance << endl;
     currentDistance += MSTDistance(unvisited, zooCages, distanceMatrix);
@@ -125,7 +125,7 @@ bool promising (double currentDistance, double &minDistance, vector<Cage> &zooCa
 }
 
 void gen_perms (vector<Cage> &zooCages, deque<int> &unvisited, vector<int> &path,
-                vector<int> &adjacent, vector<int> &distanceMatrix,
+                vector<int> &adjacent, vector<double> &distanceMatrix,
                 double &minDistance, double currentDistance) {
     currentDistance += distanceMatrix[(path.back() * zooCages.size()) +
                                       path[path.size() - 2]];
@@ -252,7 +252,7 @@ int main(int argc, char * argv[])
         vector<int> adjacent;
         deque<int> unvisited;
         vector<int> path;
-        vector<int> distanceMatrix;
+        vector<double> distanceMatrix;
         double minDistance = 0;
         double currentDistance = 0;
         double totalDistance = 0;
@@ -260,9 +260,9 @@ int main(int argc, char * argv[])
         adjacent.push_back(0);
         path.push_back(0);
         
-        for (int i = 0; i < zooCages.size(); ++i) {
-            for (int j = 0; j < zooCages.size(); ++j) {
-                distanceMatrix[(i * zooCages.size()) + j] = findDistance(i, j, zooCages);
+        for (int i = 0; i < (int)zooCages.size(); ++i) {
+            for (int j = 0; j < (int)zooCages.size(); ++j) {
+                distanceMatrix.push_back(findDistance(i, j, zooCages));
             }
         }
         
@@ -276,15 +276,15 @@ int main(int argc, char * argv[])
             zooCages[i].visited = false;
         }
         
-        gen_perms(zooCages, unvisited, path, adjacent, distanceMatrix, 
+        gen_perms(zooCages, unvisited, path, adjacent, distanceMatrix,
                   minDistance, currentDistance);
+        adjacent.push_back(0);
         for (int i = 0; i < (int)adjacent.size() - 1; ++i) {
             os << adjacent[i] << " ";
             totalDistance += distanceMatrix[(adjacent[i] * zooCages.size()) +
                                             adjacent[i + 1]];
         }
         os << '\n';
-        totalDistance += distanceMatrix[adjacent[adjacent.size() - 1]];
         
         cout << fixed << setprecision(2) << totalDistance << '\n';
     }
@@ -327,7 +327,7 @@ int main(int argc, char * argv[])
                 }
             }
         }
-
+        
         for (int i = 0; i < (int)zooCages.size() - 1; ++i) {
             totalDistance += findDistance(adjacent[i],adjacent[i + 1], zooCages);
             os << adjacent[i] << " ";
