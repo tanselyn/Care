@@ -115,7 +115,6 @@ double MSTDistance(deque<int> &unvisited, vector<Cage> &zooCages, vector<double>
 
 bool promising (double currentDistance, double &minDistance, vector<Cage> &zooCages,
                 vector<double> &distanceMatrix, deque<int> &unvisited, vector<int> &path) {
-    unvisited.push_back(0);
     //cerr << currentDistance << endl;
     currentDistance += MSTDistance(unvisited, zooCages, distanceMatrix);
     //cerr << currentDistance << endl;
@@ -135,7 +134,6 @@ bool promising (double currentDistance, double &minDistance, vector<Cage> &zooCa
     }
     currentDistance += minConnection1;
     currentDistance += minConnection2;
-    unvisited.pop_back();
     if (currentDistance < minDistance) return true;
     else return false;
 }
