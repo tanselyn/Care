@@ -149,7 +149,7 @@ void gen_perms (vector<Cage> &zooCages, deque<int> &unvisited, vector<int> &path
     currentDistance += distanceMatrix[(path.back() * zooCages.size()) +
                                       path[path.size() - 2]];
     if (unvisited.empty()) {
-        currentDistance += distanceMatrix[path[path.size() - 2]];
+        currentDistance += distanceMatrix[path.back()];
         
         if (currentDistance < minDistance) {
             minDistance = currentDistance;
