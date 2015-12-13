@@ -23,6 +23,12 @@ double findDistance(int i, int j, vector<Cage> &zooCages) {
     return sqrt((x * x) + (y * y));
 }
 
+double simpleDistance(int i, int j, vector<fastCage> &simpleCages) {
+    double x = simpleCages[i].xCoord - simpleCages[j].xCoord;
+    double y = simpleCages[i].yCoord - simpleCages[j].yCoord;
+    return sqrt((x * x) + (y * y));
+}
+
 double FASTDistance(vector<Cage> &zooCages, vector<int> &adjacent,
                     vector<double> &distanceMatrix) {
     double totalDistance = 0;
@@ -178,7 +184,7 @@ int main(int argc, char * argv[])
     ostringstream os;
     
     vector<Cage> zooCages;
-    
+    vector<fastCage> simpleCages;
     string input;
     double totalDistance = 0;
     int visitCages = 0;
@@ -205,20 +211,32 @@ int main(int argc, char * argv[])
     
     getline(cin,input);
     index = stoi(input);
-    while (index > 0) {
-        getline(cin,input);
-        pos = (int)input.find(' ',0);
-        Cage insert((int)zooCages.size(),stoi(input.substr(0,pos)),stoi(input.substr(pos)),
-                    0,false);
-        if ((insert.xCoord == 0 && insert.yCoord <= 0) ||
-            (insert.yCoord == 0 && insert.xCoord <= 0)) {
-            insert.wild = 1;
+    if (mode == 'S' || mode == 'P') {
+        while (index > 0) {
+            getline(cin,input);
+            pos = (int)input.find(' ',0);
+            Cage insert(stoi(input.substr(0,pos)),stoi(input.substr(pos)),
+                        0,false);
+            if ((insert.xCoord == 0 && insert.yCoord <= 0) ||
+                (insert.yCoord == 0 && insert.xCoord <= 0)) {
+                insert.wild = 1;
+            }
+            else if (insert.xCoord < 0 && insert.yCoord < 0) {
+                insert.wild = 2;
+            }
+            zooCages.push_back(insert);
+            --index;
         }
-        else if (insert.xCoord < 0 && insert.yCoord < 0) {
-            insert.wild = 2;
+    }
+    if (mode == 'A') {
+        while (index > 0) {
+            getline(cin,input);
+            pos = (int)input.find(' ',0);
+            fastCage insert(stoi(input.substr(0,pos)),stoi(input.substr(pos)),
+                            false);
+            simpleCages.push_back(insert);
+            --index;
         }
-        zooCages.push_back(insert);
-        --index;
     }
     
     if (mode == 'S') {
@@ -308,25 +326,23 @@ int main(int argc, char * argv[])
     }
     if (mode == 'A') {
         vector<int> adjacent;
-        zooCages.front().distance = 0;
-        zooCages.front().visited = true;
-        zooCages.front().parent = 0;
+        simpleCages.front().visited = true;
         
         index = 0;
         adjacent.push_back(0);
-        while (visitCages < (int)zooCages.size() - 1) {
+        while (visitCages < (int)simpleCages.size() - 1) {
     	    double minDistance = numeric_limits<double>::infinity();
             int minIndex = 0;
-            for (int i = 1; i < (int)zooCages.size(); ++i) {
-                if (zooCages[i].visited == false) {
-                    double distance = findDistance(index, i, zooCages);
+            for (int i = 1; i < (int)simpleCages.size(); ++i) {
+                if (simpleCages[i].visited == false) {
+                    double distance = simpleDistance(index, i, simpleCages);
                     if (distance < minDistance) {
                         minIndex = i;
                         minDistance = distance;
                     }
                 }
             }
-    	    zooCages[minIndex].visited = true;
+            simpleCages[minIndex].visited = true;
             index = minIndex;
             adjacent.push_back(minIndex);
             
@@ -335,25 +351,25 @@ int main(int argc, char * argv[])
         adjacent.push_back(0);
         
         for (int i = 0; i < (int)adjacent.size() - 3; ++i) {
-            double temp = findDistance(adjacent[i], adjacent[i + 1], zooCages);
+            double temp = simpleDistance(adjacent[i], adjacent[i + 1], simpleCages);
             for (int j = i + 2; j < (int)adjacent.size() - 1; ++j) {
-                double change = (findDistance(adjacent[i], adjacent[j], zooCages)) +
-                (findDistance(adjacent[i + 1], adjacent[j + 1], zooCages)) -
-                (temp) - (findDistance(adjacent[j], adjacent[j + 1], zooCages));
+                double change = (simpleDistance(adjacent[i], adjacent[j], simpleCages)) +
+                (simpleDistance(adjacent[i + 1], adjacent[j + 1], simpleCages)) -
+                (temp) - (simpleDistance(adjacent[j], adjacent[j + 1], simpleCages));
                 
                 if (change < 0) {
                     reverse(adjacent.begin() + i + 1, adjacent.begin() + j + 1);
-                    temp = findDistance(adjacent[i], adjacent[i + 1], zooCages);
+                    temp = simpleDistance(adjacent[i], adjacent[i + 1], simpleCages);
                 }
             }
         }
         
-        for (int i = 0; i < (int)zooCages.size() - 1; ++i) {
-            totalDistance += findDistance(adjacent[i],adjacent[i + 1], zooCages);
+        for (int i = 0; i < (int)simpleCages.size() - 1; ++i) {
+            totalDistance += simpleDistance(adjacent[i],adjacent[i + 1], simpleCages);
             os << adjacent[i] << " ";
         }
         os << adjacent[adjacent.size() - 2] << '\n';
-        totalDistance += findDistance(0, adjacent[adjacent.size() - 2], zooCages);
+        totalDistance += simpleDistance(0, adjacent[adjacent.size() - 2], simpleCages);
         
         cout << fixed << setprecision(2) << totalDistance << '\n';
     }
